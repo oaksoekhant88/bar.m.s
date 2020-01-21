@@ -9,7 +9,7 @@ const
 
   const pageaccesstoken = 'EAAFTZCOKuRkYBAEp1cGMZBnZA1MRTIBIxeFj8A0MhoziHoP7qrSnQEB4sbXFlgSZCOIeNdrr8INUAVIcx13yZAdpJiUBIq3YldXuhnnTL7LyORtkZA3ovrYxBnLaEkWNOWRcZA0zXMhojQohlqK0rnNoroQJkyfD2ldH2sMHxtPCgZDZD'
 
-  requestify.post(`https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${pageaccesstoken}`, 
+  requestify.post(`https://graph.facebook.com/v5.0/me/messenger_profile?access_token=${pageaccesstoken}`, 
   {
     "get_started": {
       "payload": "Hi"
@@ -25,7 +25,7 @@ const
     ]
   }
 ).then( response => {
-  console.log(response)
+  console.log('success',response)
 }).fail( error => {
   console.log(error)
 })
