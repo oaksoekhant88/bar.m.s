@@ -4,18 +4,40 @@
 const
   express = require('express'),
   bodyParser = require('body-parser'),
+  requestify = require('requestify'),
   app = express().use(bodyParser.json()); // creates express http server
-  const pageaccesstoken = 'EAAFTZCOKuRkYBAJE60VHTLR0iQUIkwZAMgOyJxZAGYJF0Bu3wbi0Dek5TzFKSCpRPpm7fmIZB9u2u6UUZCwxTx122pnZAKTdUc4rvalEox9tHZBzBZBn0rZC7CuAZAVHTNZCmYZAvIcDBC4uyxyAZANvLJHpcHXYMqGFfqK0HeKLz7vcpGwZDZD'
 
+  const pageaccesstoken = 'EAAFTZCOKuRkYBAEp1cGMZBnZA1MRTIBIxeFj8A0MhoziHoP7qrSnQEB4sbXFlgSZCOIeNdrr8INUAVIcx13yZAdpJiUBIq3YldXuhnnTL7LyORtkZA3ovrYxBnLaEkWNOWRcZA0zXMhojQohlqK0rnNoroQJkyfD2ldH2sMHxtPCgZDZD'
 
-// Sets server port and logs message on success
+  requestify.post(`https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${pageaccesstoken}`, 
+  {
+    "get_started": {
+      "payload": "Hi"
+    },
+    "greeting": [
+      {
+        "locale":"default",
+        "text":"Hello {{user_first_name}}!" 
+      }, {
+        "locale":"en_US",
+        "text":"Timeless apparel for the masses."
+      }
+    ]
+  }
+).then( response => {
+  console.log(response)
+}).fail( error => {
+  console.log(error)
+})
+
+  // Sets server port and logs message on success
 app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
 
 // Adds support for GET requests to our webhook
 app.get('/webhook', (req, res) => {
 
     // Your verify token. Should be a random string.
-    let VERIFY_TOKEN = "373820576646726"
+    let VERIFY_TOKEN = "oaksoekhant"
       
     // Parse the query params
     let mode = req.query['hub.mode'];
@@ -39,7 +61,7 @@ app.get('/webhook', (req, res) => {
     }
   });
 
-  // Creates the endpoint for our webhook 
+// Creates the endpoint for our webhook 
 app.post('/webhook', (req, res) => {  
  
     let body = req.body;
@@ -54,6 +76,29 @@ app.post('/webhook', (req, res) => {
         // will only ever contain one message, so we get index 0
         let webhook_event = entry.messaging[0];
         console.log(webhook_event);
+        if(webhook_event.message){
+          var userInput = webhook_event.message.text
+        }
+        if(webhook_event.postback){
+          var userButton = webhook_event.postback.payload
+        }
+        if (userInput == 'Hi' || userButton == 'Hi' ){
+          let welcomeMessage = {
+            "recipient":{
+              "id":webhook_event.sender.id
+            },
+            "message":{
+              "text":"Hello, Welcome to Online Bar Management!"
+            }
+          }
+          requestify.post(`https://graph.facebook.com/v5.0/me/messages?access_token=${pageaccesstoken}`, 
+          welcomeMessage
+          ).then(response=>{
+            console.log(response)
+          }).fail(error=> {
+            console.log(error)
+          })
+        }  
       });
   
       // Returns a '200 OK' response to all requests
